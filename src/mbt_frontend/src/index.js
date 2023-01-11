@@ -1,19 +1,26 @@
-import { mbt_backend } from "../../declarations/mbt_backend";
+import * as ReactDOMClient from 'react-dom/client';
+import * as React from 'react';
+import CssBaseline from '@mui/material/CssBaseline';
+import App from './App';
+import * as serviceWorker from './serviceWorker';
 
-document.querySelector("form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const button = e.target.querySelector("button");
 
-  const name = document.getElementById("name").value.toString();
 
-  button.setAttribute("disabled", true);
+const container = document.getElementById('root');
 
-  // Interact with foo actor, calling the greet method
-  const greeting = await mbt_backend.greet(name);
+// Create a root.
+const root = ReactDOMClient.createRoot(container);
 
-  button.removeAttribute("disabled");
+// Initial render: Render an element to the root.
+root.render(
+  <>
+    {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+    <CssBaseline />
+    <App />
+  </>);
 
-  document.getElementById("greeting").innerText = greeting;
 
-  return false;
-});
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();

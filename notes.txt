@@ -1,0 +1,18 @@
+echo '*** BEGIN REPLICATOR DEPLOY CODE ***'
+
+yes yes | dfx deploy --upgrade-unchanged icrc1 --argument "( record {\
+      name = \"Motoko Bootcamp Token\"; \
+      symbol = \"MBT\"; \
+      decimals = 6; \
+      fee = 1_000_000; \
+      max_supply = 1_000_000_000_000; \
+      initial_balances = vec {}; \
+      min_burn_amount = opt 10_000_000; \
+      minting_account = opt record{owner=principal\"sgymv-uiaaa-aaaaa-aaaia-cai\"; }; \
+      permitted_drift = null; \
+      transaction_window = null; \
+  })"
+
+echo '*** END REPLICATOR DEPLOY CODE ***'
+
+
