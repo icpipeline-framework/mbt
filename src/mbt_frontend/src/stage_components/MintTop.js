@@ -97,28 +97,34 @@ const MintTop = (props) => {
 
   const clickMintMBT = async ()  =>  {
 
-    const mintNumberAsNumber = Number (mintNumberOfTokens.replace(/,/g,'')) ;
+    var mintNumberAsNumber = Number (mintNumberOfTokens.replace(/,/g,'')) ;
     var anyError = "";
 
     if (walletPrincipal == "" ) {
       anyError += "A Wallet Principal is required. ";
 
-    } 
-    if (isNaN (mintNumberAsNumber) || mintNumberAsNumber <= 0 ) {
-      anyError = "A quantity of Tokens is required. ";
-    
-    } // end if mint number
+    } else {
 
-    try {
-      var walletPrincipalAsPrincipal = Principal.fromText(walletPrincipal);
-    } catch (e) {
-      
-      anyError += `Wallet Principal is not valid : ${e} . `;
+      try {
+        var walletPrincipalAsPrincipal = Principal.fromText(walletPrincipal);
+      } catch (e) {
+        
+        anyError += `Wallet Principal is not valid : ${e} . `;
 
-      console.log("catch error from principal",e);
+        console.log("catch error from principal",e);
+        
+        
+      } // end try catch 
       
+    }
+    if (!anyError) {
+       // then we try the how many tokens
+
+      if (isNaN (mintNumberAsNumber) || mintNumberAsNumber <= 0 ) {
+        anyError += "A quantity of Tokens is required. ";
       
-    } // end try catch 
+      } // end if mint number
+    } // end if error with the principal
     
     if (anyError) {
         setErrorMsg (anyError);
@@ -130,7 +136,8 @@ const MintTop = (props) => {
 
       console.log ("clickMintMBT BEGIN - mintNumberAsNumber: ", mintNumberAsNumber) ;
       setIsMinting(true);
-      
+      mintNumberAsNumber = mintNumberAsNumber * 100000000;
+
       const mintRequest = {
         to: {
           owner : walletPrincipalAsPrincipal,
@@ -257,7 +264,7 @@ const MintTop = (props) => {
               
 
           <Typography variant="h4" align="center" color="#ffffff" component="p" sx={{p:2,fontStyle:"bold"}}>
-          Mintin' 
+          Minting MBT now ...
           </Typography>
 
           <LinearProgress sx={{m:6,mt:2}}/>
@@ -283,9 +290,32 @@ const MintTop = (props) => {
           Contact us if you have any issues, or think anything got weird ...
           </Typography>
 
-          <Button key={1}  variant="contained" onClick={() => { resetMint(); }} sx={{ m:"auto", display:"flex", width:"300px"}}>
-              Mint Som'more ...
-        </Button>
+          <Grid container>
+            <Grid item xs={4} sx={{display:"flex", pl:1, pr:1, justifyContent:"right"}} >
+
+              </Grid>
+              <Grid item xs={4} sx={{display:"flex", pl:1, pr:1}} >
+                <Button key={1}  variant="contained" onClick={() => { resetMint(); }} sx={{ m:"auto", display:"flex", width:"300px"}}>
+                    Mint more MBT
+              </Button>
+
+              </Grid>
+            <Grid item xs={4} sx={{display:"flex", pl:1, pr:1, justifyContent:"right"}} >
+
+                <Tooltip key={1}  title="Learn more about how to get your Wallet Principal for minting" placement="top" enterNextDelay={300}>
+                <IconButton
+                      edge="start"
+                      color="inherit"
+                      aria-label={props.tooltip}
+                      onClick={() => { props.mainNavClick("mintHow")} }
+                      sx={{
+                      }}
+                  >
+                    <HelpOutlineIcon sx={{color:"#fdf0de"}}/> 
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            </Grid>
       </Paper>
 
 
@@ -306,7 +336,7 @@ const MintTop = (props) => {
           
 
 
-          <Box elevation={0} sx={{  border:"0px solid #f9c57d", borderRadius:2, m:"auto", mt:2, mb:2, width:{xs:"300px", sm:"80%"}, p:2,  justifyContent:"center"}} >      
+          <Box elevation={0} sx={{  border:"0px solid #f9c57d", borderRadius:2, m:"auto", mt:2, mb:2,  p:2,  justifyContent:"center"}} >      
               
               <img
                   src={
@@ -315,7 +345,7 @@ const MintTop = (props) => {
                   srcSet={"mbtMain.png?"}
                   alt="MBT Logo"
                   loading="lazy"
-                  style={{ display:"block", width:"100%"}}
+                  style={{ width:"100%"}}
                   />
           </Box>
 
@@ -350,7 +380,7 @@ const MintTop = (props) => {
                   , p:2
                   }}
                   >
-                  Mint Motoko Bootcamp Tokens (MBTs)
+                  Mint Motoko Bootcamp Tokens (MBT)
                   </Typography>
 
               </Grid>
@@ -371,7 +401,7 @@ const MintTop = (props) => {
         </Typography>
 
         <Typography variant="subtitle2" align="center" color="#673e05" component="p" sx={{p:2}}>
-          MBTs are to be used during the bootcamp and all tokens have NO value other than to help you learn.
+          MBT are to be used during the bootcamp and all tokens have NO value other than to help you learn.
         </Typography>
       
 

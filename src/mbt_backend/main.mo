@@ -58,7 +58,7 @@ actor {
     #err: TransferError;
     #ok: Balance;
   };
-  
+
   //MintNowResponse
   public type MintNowResponse = {
     mintResponse: Result.Result<Balance, TransferError>  ;
@@ -67,8 +67,10 @@ actor {
     responseStatus: Text;
   };
 
-  //LOCAL
-  var icrc1CanisterId : Text = "q4eej-kyaaa-aaaaa-aaaha-cai";
+  // //LOCAL
+  // var icrc1CanisterId : Text = "q4eej-kyaaa-aaaaa-aaaha-cai";
+  //PROD
+  var icrc1CanisterId : Text = "db3eq-6iaaa-aaaah-abz6a-cai";
 
   // instantiate the actor for the icrc1 token
   let icrc1CanisterActor = actor(icrc1CanisterId): actor { 

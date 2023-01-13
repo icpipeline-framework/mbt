@@ -66,7 +66,7 @@ const mainNavClick =  (whereTo) => {
     refMintHow.current.scrollIntoView({ behavior: 'smooth' });
   } else if (whereTo == "mintWhat") {
     checkLocation ("/" )
-    refMintHow.current.scrollIntoView({ behavior: 'smooth' });
+    refMintWhat.current.scrollIntoView({ behavior: 'smooth' });
 
   } else if (whereTo == "student") {
   
@@ -103,9 +103,21 @@ const mainNavClick =  (whereTo) => {
   } else if (whereTo == "stoic") {
   
     window.open ("https://www.stoicwallet.com/", "_blank" );
+  
+  } else if (whereTo == "icpipeline") {
+  
+    window.open ("https://www.icpipeline.com/", "_blank" );
+
+  } else if (whereTo == "natlabs") {
+  
+    window.open ("https://github.com/NatLabs", "_blank" );
+
+  } else if (whereTo == "natlabsicrc") {
+  
+    window.open ("https://github.com/NatLabs/icrc1", "_blank" );
 
    
-
+    
 
     
   } else {

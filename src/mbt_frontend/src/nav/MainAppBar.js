@@ -39,17 +39,38 @@ const MainAppBar = (props) => {
 
   var displayNav = [
     
-        <Box key={1} sx={{textAlign:"right", width:"100%" }}>
-          <Tooltip title="This Tip" enterNextDelay={300}>
+    <Box key={1} sx={{display:"flex", alignContent:"baseline", pt: {xs: 0,md: 13,}, justifyContent:{xs: "right",md: "left",}, border:"0px solid #000", flexGrow:1 }}>
+          <Tooltip title="Mint MBTs" enterNextDelay={300}>
           <Link
             variant="button"
-            color="#fff"
-            href="#"
+            color="text.primary"
             underline="hover"
-            sx={{ my: 1, mx: 1.5 }}
+            sx={{ my: 1, mx: 1.5, cursor:"pointer" }}
             onClick={() => { props.mainNavClick("Home")}}
           >
-            This is an example
+            Mint
+          </Link>
+          </Tooltip>
+          <Tooltip title="How does this Work?" enterNextDelay={300}>
+          <Link
+            variant="button"
+            color="text.primary"
+            underline="hover"
+            sx={{ my: 1, mx: 1.5, cursor:"pointer" }}
+            onClick={() => { props.mainNavClick("mintHow")}}
+          >
+            How
+          </Link>
+          </Tooltip>
+          <Tooltip title="What are MBTs?" enterNextDelay={300}>
+          <Link
+            variant="button"
+            color="text.primary"
+            underline="hover"
+            sx={{ my: 1, mx: 1.5, cursor:"pointer" }}
+            onClick={() => { props.mainNavClick("mintWhat")}}
+          >
+            What
           </Link>
           </Tooltip>
         </Box>
@@ -62,7 +83,7 @@ const MainAppBar = (props) => {
       colorDocumentation=colorNotActive;
 
       displayNav = [
-        <Box key={1} sx={{textAlign:"right", width:"100%" }}>
+        <Box key={1} sx={{display:"flex", justifyContent:"left", border:"1px solid #000", flexGrow:1 }}>
           <Tooltip title="I want Rewards" enterNextDelay={300}>
           <Link
             variant="button"
@@ -97,31 +118,38 @@ const MainAppBar = (props) => {
     >
       <Toolbar sx={{ flexWrap: 'wrap', backgroundColor:"#f3920c" }}>
 
-      <Grid container sx={{border:"0px solid #000"}}>
-        <Grid item xs={12}  sx={{
+          
+      <Grid container sx={{border:"0px solid #000",  maxWidth: 'xl', m:"auto"}}>
+        <Grid item xs={0} md={3} sx={{}}>
+          
+        </Grid>
+        <Grid item xs={12} md={6} sx={{
                                     p: {
                                         xs:0 ,
                                         md:2,
                                     }}}>
           
-              <Box
+                <Box
                   onClick={() => { props.mainNavClick("Home")}}
-                  component="img"
+                  
                   sx={{
                     content: {
                         xs: `url("mbHeaderBannerFull.png")`,//img src from xs up to md
                         md: `url("mbHeaderBannerFull.png")`,  //img src from md and up
                     },
                     cursor:"pointer"
-                    , width: {
-                      xs: "450px",
-                      md: "720px",
-                    }
+                    ,width:"100%", border:"0px solid #000"
                   }}
                   alt="Logo"
               />
+          
         </Grid>
+        <Grid item xs={12} md={3} sx={{alignContent:"baseline" , display:"flex", border:"0px solid #000"}}>
+          {displayNav}
         </Grid>
+      </Grid>
+        
+        
         
         {/*
         

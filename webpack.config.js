@@ -53,7 +53,13 @@ module.exports = {
   devtool: isDevelopment ? "source-map" : false,
   optimization: {
     minimize: !isDevelopment,
-    minimizer: [new TerserPlugin()],
+    minimizer: [new TerserPlugin({
+      terserOptions: {
+        compress: {
+          drop_console: true
+        }
+      }
+    })],
   },
   resolve: {
     extensions: [".js", ".ts", ".jsx", ".tsx"],
