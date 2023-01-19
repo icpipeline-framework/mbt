@@ -8,13 +8,28 @@ import GlobalStyles from '@mui/material/GlobalStyles';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+
+
+/// **** CONNECT TO IC BEGIN
+
+import { defaultProviders } from "@connect2ic/core/providers"
+import { createClient } from "@connect2ic/core"
+import { Connect2ICProvider } from "@connect2ic/react"
+import { AstroX } from "@connect2ic/core/providers/astrox"
+import { PlugWallet } from "@connect2ic/core/providers/plug-wallet"
+//import * as counter from "canisters/counter"
+
+
+
+
 import { AuthClient } from "@dfinity/auth-client";
 import { DelegationIdentity } from "@dfinity/identity";
 import { Actor, HttpAgent } from '@dfinity/agent';
 
 // **** CUSTOM IMPORTS
+import * as mbt from "../../declarations/mbt_backend";
 
-import { mbt, idlFactory as mbtDappIdl, canisterId as mbtDappCanisterId} from "../../declarations/mbt_backend";
+import { mbt_backend, idlFactory as mbtDappIdl, canisterId as mbtDappCanisterId} from "../../declarations/mbt_backend";
 
 import Stage from './stage_components/Stage';
 
@@ -26,7 +41,15 @@ const App = () => {
 
   console.log ("______ APP RENDERED______")
 
-    
+      
+  const connect2Client = createClient({
+    canisters: {
+      mbt,
+    },
+    providers: [new PlugWallet(),]
+  })
+  console.log ("defaultProviders: ", defaultProviders);
+
 
   /*Auth*/
   const [isAuthed, setIsAuthed] = useState(false);
@@ -38,7 +61,7 @@ const App = () => {
     palette: {
       primary: {
         light: green[300],
-        main: "#f3920c",
+        main: "#fad096",
         dark: green[700],
       },
       secondary: {
@@ -109,30 +132,35 @@ const App = () => {
   
 
 
+  console.log ("______ APP RENDERED2______")
   return (
     
-    <AppContext.Provider value={userSettings}>
-    <ThemeProvider theme={defaultTheme}>
-
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-      }}
-    >
-      <BrowserRouter initialEntries={['/framework']} initialIndex={0}>   
-        <GlobalStyles styles={{ ul: { margin: 0, padding: 0, listStyle: 'none' } }} />
-          <CssBaseline />
-          <Stage />
   
+    <AppContext.Provider value={userSettings}>
+    <Connect2ICProvider client={connect2Client}>
+      <ThemeProvider theme={defaultTheme}>
 
-            
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: '100vh',
+            }}
+          >
+            <BrowserRouter initialEntries={['/framework']} initialIndex={0}>   
+              <GlobalStyles styles={{ ul: { margin: 0, padding: 0, listStyle: 'none' } }} />
+                <CssBaseline />
+    
+                <Stage />
         
 
-      </BrowserRouter>
-      </Box>
-    </ThemeProvider>
+                  
+              
+
+            </BrowserRouter>
+          </Box>
+      </ThemeProvider>
+    </Connect2ICProvider>
     </AppContext.Provider>
 
   );

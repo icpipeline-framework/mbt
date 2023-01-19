@@ -75,6 +75,9 @@ const mainNavClick =  (whereTo) => {
   } else if (whereTo == "website") {
   
     window.open ("https://vbcav-ayaaa-aaaap-aaova-cai.raw.ic0.app/", "_blank" );
+  } else if (whereTo == "candid") {
+  
+    window.open ("https://a4gq6-oaaaa-aaaab-qaa4q-cai.raw.ic0.app/?id=db3eq-6iaaa-aaaah-abz6a-cai", "_blank" );
 
   } else if (whereTo == "dfinity") {
   

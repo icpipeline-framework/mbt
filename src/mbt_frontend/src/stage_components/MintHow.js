@@ -6,6 +6,7 @@ import Link from '@mui/material/Link';
 import { IconButton } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Tooltip from '@mui/material/Tooltip';
+import LanguageIcon from '@mui/icons-material/Language';
 
 // **** CUSTOM IMPORTS
 
@@ -40,10 +41,10 @@ const MintHow = (props) => {
     setIsCopying (false );
   }// end copySSH
 
-  var displayCopy = [<ContentCopyIcon  sx={{color:'text.primary'}} />] 
+  var displayCopy = [<ContentCopyIcon key={1}  sx={{color:'text.primary'}} />] 
   
   if (isCopying) {
-    displayCopy = [<ContentCopyIcon  sx={{color:'#f9c57d'}} />] 
+    displayCopy = [<ContentCopyIcon key={1}  sx={{color:'#f9c57d'}} />] 
   }
 
   return (
@@ -91,13 +92,23 @@ const MintHow = (props) => {
               <li>
                         
                 <Typography variant="h5" align="left" color="text.primary" component="p" sx={{pt:0, pb:2,fontStyle:"regular"}}>
-                  Choose a Wallet (<Link
-                color="text.primary"
-                underline="hover"
-                onClick={() => { props.mainNavClick("bitfinity")}}
-                sx={{ml:1, mr:1, cursor:"pointer"}}
-              >Bitfinity 
-              </Link>
+                  Choose a Wallet (
+                    
+                    {/* <Link
+                      color="text.primary"
+                      underline="hover"
+                      onClick={() => { props.mainNavClick("bitfinity")}}
+                      sx={{ml:1, mr:1, cursor:"pointer"}}
+                    >Bitfinity 
+                    </Link> */}
+                    
+                    <Link
+                      color="text.primary"
+                      underline="hover"
+                      onClick={() => { props.mainNavClick("plug")}}
+                      sx={{ml:1, mr:1, cursor:"pointer"}}
+                    >Plug 
+                    </Link>
               {/* , 
               <Link
                 color="text.primary"
@@ -114,22 +125,22 @@ const MintHow = (props) => {
               >NFId
               </Link>
                */}
-              ) and collect your <b>Wallet Principal</b>
+              ) and connect it to the minter, OR collect your <b>Wallet Principal</b>
                 </Typography>
               </li>
               <li>        
                 <Typography variant="h5" align="left" color="text.primary" component="p" sx={{pt:0, pb:2,fontStyle:"regular"}}>
-                  Enter your <b>Wallet Principal</b> above, choose a quantity of tokens and hit "Mint"
+                  Afer you have your <b>Wallet Principal</b> above, choose a quantity of tokens and hit "Mint"
                 </Typography>
                 
               </li>
               <li>        
                 <Typography variant="h5" align="left" color="text.primary" component="p" sx={{pt:0, pb:0,fontStyle:"regular"}}>
-                  Add the MBT Token to your wallet ( if you haven't already ) and check your balance.
+                  Your balance will be reflected above and you can use your tokens for your DAO.
                 </Typography>
                 <Typography variant="h7" align="left" color="#673e05" component="" sx={{pt:1, pb:1,pl:3, fontStyle:"italic"}}>
                  
-                <Tooltip key={1}  title="Copy the Token Canister Id to the clipboard" placement="top" enterNextDelay={300}>
+                <Tooltip title="Copy the Token Canister Id to the clipboard" placement="top" enterNextDelay={300}>
                 <IconButton
                       edge="start"
                       color="inherit"
@@ -141,7 +152,19 @@ const MintHow = (props) => {
                     {displayCopy}
                   </IconButton>
                   </Tooltip>
-                  <b>CanisterId</b>: {icrc1Canisterid} 
+                  <b>CanisterId</b>: {icrc1Canisterid}  -  click for canidid UI ->
+                <Tooltip title="View the Candid Interface" placement="top" enterNextDelay={300}>
+                <IconButton
+                      edge="start"
+                      color="inherit"
+                      aria-label={props.tooltip}
+                      onClick={() => { props.mainNavClick("candid")}}
+                      sx={{m:1, 
+                      }}
+                  >
+                    <LanguageIcon />
+                  </IconButton>
+                  </Tooltip>
 
                     </Typography>
                   <Typography variant="subtitle2" align="left" color="#673e05" component="" sx={{pt:0, pb:2,pl:8, fontStyle:"italic"}}>

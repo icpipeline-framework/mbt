@@ -12,6 +12,11 @@ import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 
 
+/// connect2IC
+import { useConnect } from "@connect2ic/react"
+import { useProviders } from "@connect2ic/react"
+
+
 import { Principal } from '@dfinity/principal';
 
 // **** CUSTOM IMPORTS
@@ -30,7 +35,12 @@ const MintTop = (props) => {
 
   
   const myContext = useContext(AppContext);
+  const [isChecking, setIsChecking] = useState(false);
+  const [loadingBalance, setLoadingBalance] = useState(false);
   const [isMinting, setIsMinting] = useState(false);
+  const [accountBalance, setAccountBalance] = useState(0);
+  const [totalSupply, setTotalSupply] = useState(0);
+
   const [isMinted, setIsMinted] = useState(false);
   const [textFieldValue, setTextFieldValue] = useState("");
   const [textFieldType, setTextFieldType] = useState("account");
@@ -39,10 +49,53 @@ const MintTop = (props) => {
   
   const [errorMsg, setErrorMsg] = useState("");
 
+  const [walletConnected, setWalletConnected] = useState(false);
+
   const mbtDapp = myContext.mbtDappName;
 
+    const {
+      principal,
+      status,
+      isConnected,
+      isInitializing,
+    } = useConnect({
+      onConnect: () => {
+        // Signed in
+        console.log ("MINTTOP LOGGED in ");
+        
+        setWalletConnected (true);
+      },
+      onDisconnect: () => {
+        // Signed out
+        console.log ("MINTTOP LOGGED out ");
+        
+        setWalletConnected (false);
+        //setWalletPrincipal ("");
+      }
+    })
 
+    if (walletPrincipal != principal && principal != "" && status.idle == "connected" ) {
+      setWalletPrincipal (principal); 
+    } 
+    if (status.idle == "connected" && walletPrincipal == "" ) {
+      setWalletPrincipal(principal);
+      if (isChecking) 
+        setIsChecking(false);
+    }
+    if (status.idle == "initializing" && walletPrincipal == "" ) {
+      if (!isChecking) 
+        setIsChecking(true);
+    }
+    if (status.idle == "idle" && !principal) {
+      if (isChecking) 
+        setIsChecking(false);
+    }
+    if (status.idle == "disconnecting" ) {
+      if (walletPrincipal != "" ) {
+        setWalletPrincipal("");
 
+      }
+    }
   const onAccountNumberChange = (e) => {
   
     setWalletPrincipal(e.target.value);
@@ -86,6 +139,7 @@ const MintTop = (props) => {
   const resetMint = async ()  =>  {
 
     console.log ("resetMint BEGIN") ;
+    setLoadingBalance (false);
     setMintNumberOfTokens ("" );
     setWalletPrincipal ("" );
 
@@ -95,7 +149,7 @@ const MintTop = (props) => {
 
   } // end clickCanisterAccount
 
-  const clickMintMBT = async ()  =>  {
+  const clickMintMBs = async ()  =>  {
 
     var mintNumberAsNumber = Number (mintNumberOfTokens.replace(/,/g,'')) ;
     var anyError = "";
@@ -134,7 +188,7 @@ const MintTop = (props) => {
         setErrorMsg (""); 
 
 
-      console.log ("clickMintMBT BEGIN - mintNumberAsNumber: ", mintNumberAsNumber) ;
+      console.log ("clickMintMBs BEGIN - mintNumberAsNumber: ", mintNumberAsNumber) ;
       setIsMinting(true);
       mintNumberAsNumber = mintNumberAsNumber * 100000000;
 
@@ -164,7 +218,7 @@ const MintTop = (props) => {
 
       } else {
       
-        if ( !fetchData.mintResponse.ok ) {
+        if ( !(fetchData.mintResponse.ok > -1 )) {
 
         var fetchDataString = JSON.stringify (fetchData, (key, value) =>
                   typeof value === 'bigint'
@@ -184,36 +238,119 @@ const MintTop = (props) => {
 
     } // end if there were any errors with the form
 
-    console.log ("clickMintMBT END") ;
+    console.log ("clickMintMBs END") ;
 
-  } // end clickMintMBT
+  } // end clickMintMBs
 
 
-  var displayMainMint = [
 
-      <Paper elevation={0} key={1} sx={{ backgroundColor:"#673e05" ,border:"0px solid #f9c57d", borderRadius:2, m:"auto", mt:2, mb:2, width:"85%", p:2,  justifyContent:"center"}} >      
-          <ShowError errorMsg={errorMsg}/>
-        <Box sx={{ backgroundColor:"#fdf0de",  p:2, display:"flex", mb:1, borderRadius:2, fontStyle:"bold"}}>
-          <Grid container>
-            <Grid item xs={12} md={6}  sx={{display:"flex", pl:1, pr:1}} >
-              
-            <FormTextField 
-                  onChange={onAccountNumberChange}
-                  value={walletPrincipal}
-                  label={"Wallet Principal"} //optional
-                  type="text"
-                  helperText=""
-                  />  
-            </Grid>
-            <Grid item xs={12} md={3} sx={{display:"flex", pl:1, pr:1}} >
-              
-            <FormTextField 
-                  onChange={onMintNumberOfTokensChange}
-                  value={mintNumberOfTokens}
-                  label={"How Many Tokens?"} //optional
-                  type="text"
-                  helperText=""
-                  />  
+  const checkAccountBalance = async ()  =>  {
+
+    var mintNumberAsNumber = Number (mintNumberOfTokens.replace(/,/g,'')) ;
+      console.log ("checkAccountBalance BEGIN: ", mintNumberAsNumber) ;
+      if (errorMsg != "")
+        setErrorMsg ("");
+    var anyError = "";
+
+    if (walletPrincipal == "" ) {
+      anyError += "A Wallet Principal is required. ";
+
+    } else {
+
+      try {
+        var walletPrincipalAsPrincipal = Principal.fromText(walletPrincipal);
+      } catch (e) {
+        
+        anyError += `Wallet Principal is not valid : ${e} . `;
+
+        console.log("catch error from principal",e);
+        
+        
+      } // end try catch 
+      
+    }
+    
+    if (anyError) {
+        setErrorMsg (anyError);
+
+    } else {
+
+      if (errorMsg != "")
+        setErrorMsg (""); 
+
+
+      setIsChecking(true);
+
+      
+      const tempAccount =  {
+          owner : walletPrincipalAsPrincipal,
+          subaccount: []
+        };
+
+  
+      // const fetchData = await mbtDapp.greet("what up").catch(e => { return "ICPM Error: " + e });
+      var tempError = "";
+      const fetchData = await mbtDapp.checkAccountBalance(tempAccount).catch(e => { tempError = "Check token Error: " + e });
+      
+      console.log ("2- checkAccountBalance - after await");
+  
+      console.log ("checkAccountBalance Response: ", fetchData);
+  
+      
+      if ( tempError != "" ) {
+        setErrorMsg (tempError);
+
+      } else {
+      
+        if (  (fetchData.responseStatus != "Green" )) {
+
+        var fetchDataString = JSON.stringify (fetchData, (key, value) =>
+                  typeof value === 'bigint'
+                      ? Number(value)
+                      : value // return everything else unchanged
+                  , 2) ;
+
+          setErrorMsg (fetchDataString);
+        } else {
+          setAccountBalance (fetchData.accountBalance) ;
+          setTotalSupply(fetchData.totalSupply);
+
+        }
+        
+    
+      } // end if error from IC call
+  
+      setIsChecking(false);
+
+    } // end if there were any errors with the form
+
+    console.log ("checkAccountBalance END") ;
+
+  } // end checkAccountBalance
+
+
+  var displayForm = [
+
+      <Grid  key={1}  container>
+        <Grid item xs={12} md={6}  sx={{display:"flex", pl:1, pr:1}} >
+                  
+        <FormTextField 
+              onChange={onAccountNumberChange}
+              value={walletPrincipal}
+              label={"Wallet Principal"} //optional
+              type="text"
+              helperText=""
+              />  
+        </Grid>
+          <Grid item xs={12} md={3} sx={{display:"flex", pl:1, pr:1}} >
+            
+          <FormTextField 
+                onChange={onMintNumberOfTokensChange}
+                value={mintNumberOfTokens}
+                label={"How Many Tokens?"} //optional
+                type="text"
+                helperText=""
+                />  
             </Grid>
             <Grid item xs={12} md={3}  sx={{display:"flex"}} >
                     
@@ -221,7 +358,106 @@ const MintTop = (props) => {
               Number of Tokens should not exceed 100,000. 
               </Typography> 
             </Grid>
+      </Grid>
+
+  ] ;
+  // if we have a principal from the wallet show that ...
+
+
+  // check if we have a principal and we are connected to a wallet
+  if (walletPrincipal && principal && isConnected) {
+
+    if (!loadingBalance) {
+      setLoadingBalance (true);
+      checkAccountBalance () ;
+
+    }
+
+    // var displayPrincipalBalanceOf = [ 
+
+    //   <Button key={1}  variant="outlined" onClick={() => { checkAccountBalance(); }} sx={{ m:"auto", flexGrow:1, display:"flex"}}>
+    //         Check Balance
+    //   </Button>
+
+    // ]
+    
+    var displayPrincipalBalanceOf = [ 
+
+      <Grid key={1} container sx={{backgroundColor:"#fce8cc", borderRadius:2, mb:1,p:1,border:"1px solid #673e05", }}>
+        <Grid item xs={12} md={6}>
+              
+            <Typography variant="h4" color="#673e05" component="p" sx={{p:1,fontStyle:"", textAlign:{xs:"center",md:"right"}}}>
+              Your Current Balance:
+            </Typography> 
+
+        </Grid>
+        <Grid item xs={12} md={6} sx={{display:"flex", justifyContent: {xs:"center",md:"left"}}}>
+              
+              <Typography variant="h4" color="#673e05" component="p" sx={{p:1,fontStyle:"", borderBottom:"1px solid #f7b354", width:"200px",textAlign:{xs:"center",md:"left"}}}>
+                {((Number(accountBalance)/100000000).toLocaleString("en-US"))} MBs
+              </Typography> 
+          
+        </Grid>
+      </Grid>
+    ]; //
+    
+
+
+
+    displayForm = [
+      <Grid key={1} container>
+
+      <Grid item xs={12} md={12}  sx={{ pl:1, pr:1, display:"flex", pb:1}} >
+        {displayPrincipalBalanceOf} 
+      </Grid>
+      <Grid item xs={12} md={6}  sx={{ pl:1, pr:1}} >
+        <Box sx={{backgroundColor:"", borderRadius: 1, pt:0.5,pb:0.5,pl:1, pr:1,mb:1, border:"1px solid #ca7a0a"}} >
+          <Grid container>
+            <Grid item xs={4} >
+
+              <Typography variant="subtitle2" color="#6d6d6d" sx={{m:0, mr:2, p:0, border:"0px solid #ca7a0a", float:"left"}}>
+              Wallet Principal:
+              </Typography>
+            </Grid>
+            <Grid item xs={8} >
+
+                <Typography variant="subtitle2" color="#ca7a0a" sx={{m:0, p:0, border:"0px solid #ca7a0a"}}>
+                {walletPrincipal}
+                </Typography>
+            </Grid>
           </Grid>
+        </Box>
+          
+      </Grid>
+          <Grid item xs={12} md={3} sx={{display:"flex", pl:1, pr:1}} >
+            
+          <FormTextField 
+                onChange={onMintNumberOfTokensChange}
+                value={mintNumberOfTokens}
+                label={"How Many Tokens?"} //optional
+                type="text"
+                helperText=""
+                />  
+            </Grid>
+            <Grid item xs={12} md={3}  sx={{display:"flex"}} >
+                    
+              <Typography variant="subtitle2" align="center" color="#ca7a0a" component="p" sx={{p:1,fontStyle:"italic"}}>
+              Number of Tokens should not exceed 100,000. 
+              </Typography> 
+            </Grid>
+      </Grid>
+  
+    ] ;
+
+  }
+
+  var displayMainMint = [
+
+      <Paper elevation={0} key={1} sx={{ backgroundColor:"#673e05" ,border:"0px solid #f9c57d", borderRadius:2, m:"auto", mt:2, mb:2, width:"85%", p:2,  justifyContent:"center"}} >      
+          <ShowError errorMsg={errorMsg}/>
+        <Box sx={{ backgroundColor:"#fdf0de",  p:2, display:"flex", mb:1, borderRadius:2, fontStyle:"bold"}}>
+          
+            {displayForm}
         </Box>
 
         <Grid container>
@@ -229,7 +465,7 @@ const MintTop = (props) => {
 
               </Grid>
               <Grid item xs={4} sx={{display:"flex", pl:1, pr:1}} >
-                <Button key={1}  variant="contained" onClick={() => { clickMintMBT(); }} sx={{ m:"auto", display:"flex", width:"300px"}}>
+                <Button key={1}  variant="contained" onClick={() => { clickMintMBs(); }} sx={{ m:"auto", display:"flex", width:"300px"}}>
                       Mint
                 </Button>
 
@@ -256,7 +492,7 @@ const MintTop = (props) => {
 
   ] ;
 
-  if (isMinting) {
+  if (isChecking) {
 
     displayMainMint = [
 
@@ -264,7 +500,25 @@ const MintTop = (props) => {
               
 
           <Typography variant="h4" align="center" color="#ffffff" component="p" sx={{p:2,fontStyle:"bold"}}>
-          Minting MBT now ...
+          Loading ... 
+          </Typography>
+
+          <LinearProgress sx={{m:6,mt:2}}/>
+
+      </Paper>
+
+    ] ;
+
+
+  } else if (isMinting) {
+
+    displayMainMint = [
+
+        <Paper elevation={0} key={1} sx={{p:6, backgroundColor:"#673e05" ,border:"0px solid #f9c57d", borderRadius:2, m:"auto", mt:2, mb:2, width:"85%", p:2,  justifyContent:"center"}} >      
+              
+
+          <Typography variant="h4" align="center" color="#ffffff" component="p" sx={{p:2,fontStyle:"bold"}}>
+          Minting MBs now ...
           </Typography>
 
           <LinearProgress sx={{m:6,mt:2}}/>
@@ -281,13 +535,13 @@ const MintTop = (props) => {
               
 
           <Typography variant="h4" align="center" color="#ffffff" component="p" sx={{p:2,fontStyle:"regular"}}>
-          You have successfully minted {mintNumberOfTokens} tokens!
+          You have successfully minted {mintNumberOfTokens} MB tokens!
           </Typography>
-          <Typography variant="h7" align="center" color="#ffffff" component="p" sx={{p:2,fontStyle:"regular"}}>
+          {/* <Typography variant="h7" align="center" color="#ffffff" component="p" sx={{p:2,fontStyle:"regular"}}>
           Please check your wallet to confirm. 
-          </Typography>
+          </Typography> */}
           <Typography variant="h7" align="center" color="#ffffff" component="p" sx={{p:2,fontStyle:"regular"}}>
-          Contact us if you have any issues, or think anything got weird ...
+          Contact us if you have any issues, or you think anything went wrong ...
           </Typography>
 
           <Grid container>
@@ -296,7 +550,7 @@ const MintTop = (props) => {
               </Grid>
               <Grid item xs={4} sx={{display:"flex", pl:1, pr:1}} >
                 <Button key={1}  variant="contained" onClick={() => { resetMint(); }} sx={{ m:"auto", display:"flex", width:"300px"}}>
-                    Mint more MBT
+                    Mint more MBs
               </Button>
 
               </Grid>
@@ -343,7 +597,7 @@ const MintTop = (props) => {
                   "mbtMain.png"
                   }
                   srcSet={"mbtMain.png?"}
-                  alt="MBT Logo"
+                  alt="MBs Logo"
                   loading="lazy"
                   style={{ width:"100%"}}
                   />
@@ -377,10 +631,31 @@ const MintTop = (props) => {
                   sm: "2em",
                   }
                   , fontWeight:"bold"
-                  , p:2
+                  , p:2, pb:0
                   }}
                   >
-                  Mint Motoko Bootcamp Tokens (MBT)
+                  Mint Motoko Bootcamp Tokens (MBs)
+                  </Typography>
+
+              </Grid>
+              <Grid item xs={12}>
+                  <Typography
+                  component="p"
+                  variant="subtitle2"
+                  align="center"
+                  color="#673e05"
+                  
+                  sx={{
+                  fontSize: {
+                  xs: ".8em",
+                  sm: ".8em",
+                  }
+                  , fontWeight:"bold"
+                  , fontStyle: "italic"
+                  , p:2, pb:0
+                  }}
+                  >
+                  {/* {(isChecking ? "..." : Math.round((Number(totalSupply)/100000000)).toLocaleString("en-US") + " MBs minted ")}  */}
                   </Typography>
 
               </Grid>
@@ -401,7 +676,7 @@ const MintTop = (props) => {
         </Typography>
 
         <Typography variant="subtitle2" align="center" color="#673e05" component="p" sx={{p:2}}>
-          MBT are to be used during the bootcamp and all tokens have NO value other than to help you learn.
+          MBs are to be used during the bootcamp and all tokens have NO value other than to help you learn.
         </Typography>
       
 

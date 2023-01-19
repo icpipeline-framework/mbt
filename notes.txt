@@ -8,7 +8,7 @@ yes yes | dfx deploy --upgrade-unchanged icrc1 --argument "( record {\
       max_supply = 1_000_000_000_000; \
       initial_balances = vec {}; \
       min_burn_amount = opt 10_000_000; \
-      minting_account = opt record{owner=principal\"sgymv-uiaaa-aaaaa-aaaia-cai\"; }; \
+      minting_account = opt record{owner=principal\"qsgjb-riaaa-aaaaa-aaaga-cai\"; }; \
       permitted_drift = null; \
       transaction_window = null; \
   })"
@@ -16,3 +16,21 @@ yes yes | dfx deploy --upgrade-unchanged icrc1 --argument "( record {\
 echo '*** END REPLICATOR DEPLOY CODE ***'
 
 
+
+
+echo '*** BEGIN REPLICATOR PROD CODE ***'
+
+# yes no | dfx deploy --network=ic icrc1 --argument "( record {\
+#       name = \"Motoko Bootcamp Token\"; \
+#       symbol = \"MB\"; \
+#       decimals = 8; \
+#       fee = 1_000_000; \
+#       max_supply = 1_000_000_000_000_000_000_000_000_000_000_000_000_000_000_000_000; \
+#       initial_balances = vec {}; \
+#       min_burn_amount = opt 10_000_000; \
+#       minting_account = opt record{owner=principal\"dg2ce-tqaaa-aaaah-abz6q-cai\"; }; \
+#       permitted_drift = null; \
+#       transaction_window = null; \
+#   })"
+
+echo '*** END REPLICATOR DEPLOY CODE ***'

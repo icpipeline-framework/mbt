@@ -45,11 +45,11 @@ const MintWhat = (props) => {
             , fontWeight:"bold"
           }}
         >
-          What is an MBT?
+          What is an MB?
         </Typography>
 
         <Typography variant="h5" align="left" color="text.primary" component="p" sx={{pt:0, pb:1, borderBottom :"0px solid #f9c57d", fontStyle:"regular"}}>
-          <b>M</b>otoko <b>B</b>ootcamp <b>T</b>okens were created specifically for the January 2023 Motoko Bootcamp and will be used by participants around the globe to facilitate their bootcamp projects.
+          <b>M</b>otoko <b>B</b>ootcamp tokens were created specifically for the January 2023 Motoko Bootcamp and will be used by participants around the globe to facilitate their bootcamp projects.
         </Typography>
 
         <Typography variant="h5" align="left" color="text.primary" component="p" sx={{pt:1, pb:4, borderBottom :"1px solid #f9c57d", fontStyle:"regular"}}>

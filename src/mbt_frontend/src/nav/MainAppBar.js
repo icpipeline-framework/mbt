@@ -7,11 +7,19 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+
+/// connect2IC
+import { useConnect } from "@connect2ic/react"
+import { useProviders } from "@connect2ic/react"
+
+
 
 // **** CUSTOM IMPORTS
 
 import AppContext from '../nav/AppContext';
+import { ContentCutOutlined } from '@mui/icons-material';
 
 
 const MainAppBar = (props) => {
@@ -20,15 +28,92 @@ const MainAppBar = (props) => {
   
   const myContext = useContext(AppContext);
 
+  const [everConnected, setEverConnected] = useState(false);
+  const [walletConnected, setWalletConnected] = useState(false);
+  const { cancelConnect } = useConnect() ;
 
+  // call manually somewhere  
   // check for plugged
 
   let plugWalletObject = myContext.plugWalletObjectName ;
 
   let location = useLocation();
 
+  //const [providers] = useProviders() ;
 
+  //console.log ("providers: ", providers);
 
+  // // Array<Provider>
+  // providers.map(provider => {
+  //   // Provider
+  //   provider
+    
+  //   // string
+  //   provider.meta.id
+
+  //   // string
+  //   provider.meta.name
+
+  //   // <img /> src string
+  //   provider.meta.icon.light
+  //   provider.meta.icon.dark
+  // })
+
+  const {
+    principal,
+    connect,
+    disconnect,
+    status,
+    isInitializing,
+    isIdle,
+    isConnecting,
+    isConnected,
+    isDisconnecting,
+    activeProvider,
+  } = useConnect({
+    onConnect: () => {
+      // Signed in
+      console.log ("logged in ");
+      setWalletConnected (true);
+    },
+    onDisconnect: () => {
+      // Signed out
+      console.log ("logged ou ");
+      
+      setWalletConnected (false);
+    }
+  })
+
+  const doConnect = async () => {
+
+    try {
+      cancelConnect();
+      connect ("plug");
+
+    } catch (e) {
+      
+      console.log("error on the connect",e);
+      //disconnect();
+    } // end try catch
+
+  } // end doConnect
+
+  console.log ("status: ", status);
+  console.log ("isInitializing: ", isInitializing);
+  console.log ("isIdle: ", isIdle );
+  console.log ("isConnecting: ", isConnecting);
+  console.log ("isConnected: ", isConnected   );
+  console.log ("isDisconnecting: ", isDisconnecting);
+  console.log ("principal: ", principal);
+
+  console.log ("walletConnected: ", walletConnected);
+  if (!walletConnected) {
+      //connect ();
+      console.log ("logged ou TTTTT");
+  }
+  if (isConnected && !principal) {
+    disconnect ();
+  }
 
   var colorActive = "#fce7c9";
   var colorNotActive = "#673e05";
@@ -39,7 +124,7 @@ const MainAppBar = (props) => {
 
   var displayNav = [
     
-    <Box key={1} sx={{display:"flex", alignContent:"baseline", pt: {xs: 0,md: 13,}, justifyContent:{xs: "right",md: "left",}, border:"0px solid #000", flexGrow:1 }}>
+    <Box key={1} sx={{display:"flex",  pt: {xs: 0,md: 0,}, justifyContent:{xs: "right",md: "left",}, border:"0px solid #000", flexGrow:1 }}>
           <Tooltip title="Mint MBTs" enterNextDelay={300}>
           <Link
             variant="button"
@@ -101,9 +186,74 @@ const MainAppBar = (props) => {
     } // end if about 
 
    
-
     
+    
+    var displayWalletConnected = [
 
+      <Box key={1} > 
+      <Button  variant="contained" color="secondary" onClick={() => { doConnect(); }} sx={{ display:"flex", justifyContent:"center",   width:"160px"}}>
+          Connect
+        <Box elevation={0} sx={{ ml:1, mr:1, border:"0px solid #f9c57d", justifyContent:"center"}} >      
+                
+                <img
+                    src={
+                    "mbtMain.png"
+                    }
+                    srcSet={"pluglogo.png?"}
+                    alt="Plug"
+                    loading="lazy"
+                    width="30px"
+                    />
+            </Box>
+
+      </Button>      
+
+      </Box>
+    ];
+
+    if (status.idle=="connecting" ){
+
+
+        displayWalletConnected = [
+
+          <Box key={1} > 
+          <Button disabled variant="contained" color="secondary"  sx={{ display:"flex", justifyContent:"center",   width:"160px"}}>
+              ... Connecting ...
+    
+          </Button>      
+          </Box>
+        ];
+
+    } else  {
+
+
+      if (walletConnected ){
+
+        displayWalletConnected = [
+
+          <Box key={1} > 
+          <Button  variant="contained" color="secondary" onClick={() => { disconnect(); }} sx={{ display:"flex", justifyContent:"center",  width:"160px"}}>
+            Disconnect
+              <Box elevation={0} sx={{ ml:1, mr:1, border:"0px solid #f9c57d", justifyContent:"center"}} >      
+                      
+                      <img
+                          src={
+                          "mbtMain.png"
+                          }
+                          srcSet={"pluglogo.png?"}
+                          alt="Plug"
+                          loading="lazy"
+                          width="30px"
+                          />
+                  </Box>
+          </Button>      
+    
+          </Box>
+        ];
+    }
+
+
+    }
 
     return (
       
@@ -145,7 +295,18 @@ const MainAppBar = (props) => {
           
         </Grid>
         <Grid item xs={12} md={3} sx={{alignContent:"baseline" , display:"flex", border:"0px solid #000"}}>
-          {displayNav}
+          <Grid container sx={{mt:{xs:0, md:5, }, }}> 
+                  <Grid item xs={6}  md={12} sx={{display: "flex", justifyContent:{xs: "left",md: "left",}}}>
+                                
+                    
+                      {displayWalletConnected}
+                      
+                    
+                  </Grid>
+                  <Grid item xs={6} md={12}>
+                    {displayNav} 
+                  </Grid>
+          </Grid>
         </Grid>
       </Grid>
         

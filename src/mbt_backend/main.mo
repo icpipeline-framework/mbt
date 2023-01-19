@@ -67,14 +67,25 @@ actor {
     responseStatus: Text;
   };
 
+  //BalanceOfResponse
+  public type BalanceOfResponse = {
+    accountBalance: Nat ;
+    totalSupply: Nat ;
+    msg: Text;
+    timeStamp: Int;
+    responseStatus: Text;
+  };
+
   // //LOCAL
-  // var icrc1CanisterId : Text = "q4eej-kyaaa-aaaaa-aaaha-cai";
+  //var icrc1CanisterId : Text = "qoctq-giaaa-aaaaa-aaaea-cai";
   //PROD
   var icrc1CanisterId : Text = "db3eq-6iaaa-aaaah-abz6a-cai";
 
   // instantiate the actor for the icrc1 token
   let icrc1CanisterActor = actor(icrc1CanisterId): actor { 
     icrc1_name :() -> async Text ;
+    icrc1_balance_of :(Account) -> async Nat ;
+    icrc1_total_supply :() -> async Nat ;
     mint :(Mint) -> async Result.Result<Balance, TransferError>  ;
   };
 
@@ -107,6 +118,27 @@ actor {
 
     return tempMintNowResponse;
   };
+
+  public shared func checkAccountBalance(tempAccount : Account) : async BalanceOfResponse {
+  
+    now := Time.now(); 
+    var tempMsg: Text = "";
+    var tempResponseStatus = "Green" ;      
+
+    var tempTotal : Nat = await icrc1CanisterActor.icrc1_total_supply() ;
+
+    var tempAmount : Nat = await icrc1CanisterActor.icrc1_balance_of(tempAccount) ;
+
+    var tempBalanceOfResponse : BalanceOfResponse = {
+      accountBalance = tempAmount ;
+      totalSupply = tempTotal ;
+      msg = tempMsg;
+      timeStamp = now;
+      responseStatus = tempResponseStatus;
+    };
+
+    return tempBalanceOfResponse;
+  }; // checkAccountBalance
 
 
   // public shared func greet(name : Text) : async Text {
