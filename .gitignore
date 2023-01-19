@@ -16,3 +16,7 @@ src/declarations/
 # frontend code
 node_modules/
 dist/
+
+
+# canister ids from icpipeline deployments
+canister_ids_*
