@@ -1,19 +1,40 @@
-echo '*** BEGIN REPLICATOR DEPLOY CODE ***'
 
+
+echo '*** BEGIN REPLICATOR DEPLOY CODE ***'
+mops install
 yes yes | dfx deploy --upgrade-unchanged icrc1 --argument "( record {\
       name = \"Motoko Bootcamp Token\"; \
-      symbol = \"MBT\"; \
-      decimals = 6; \
+      symbol = \"MB\"; \
+      decimals = 8; \
       fee = 1_000_000; \
-      max_supply = 1_000_000_000_000; \
+      max_supply = 1_000_000_000_000_000_000_000_000_000_000_000_000_000_000_000_000; \
       initial_balances = vec {}; \
-      min_burn_amount = opt 10_000_000; \
-      minting_account = opt record{owner=principal\"qsgjb-riaaa-aaaaa-aaaga-cai\"; }; \
-      permitted_drift = null; \
-      transaction_window = null; \
+      min_burn_amount = 10_000_000; \
+      minting_account = opt record{owner=principal\"rdmx6-jaaaa-aaaaa-aaadq-cai\"; }; \
+      advanced_settings = null;\
   })"
 
 echo '*** END REPLICATOR DEPLOY CODE ***'
+
+
+echo '*** BEGIN STAGE DEPLOY CODE ***'
+mops install
+yes no | dfx deploy --network=ic icrc1 --argument "( record {\
+      name = \"Motoko Bootcamp Token\"; \
+      symbol = \"MB\"; \
+      decimals = 8; \
+      fee = 1_000_000; \
+      max_supply = 1_000_000_000_000_000_000_000_000_000_000_000_000_000_000_000_000; \
+      initial_balances = vec {}; \
+      min_burn_amount = 10_000_000; \
+      minting_account = opt record{owner=principal\"7mc63-iaaaa-aaaah-ab37q-cai\"; }; \
+      advanced_settings = null;\
+  })"
+
+echo '*** END STAGE DEPLOY CODE ***'
+
+
+
 
 
 
@@ -34,3 +55,19 @@ echo '*** BEGIN REPLICATOR PROD CODE ***'
 #   })"
 
 echo '*** END REPLICATOR DEPLOY CODE ***'
+
+
+
+dfx canister --network=ic call db3eq-6iaaa-aaaah-abz6a-cai icrc1_transfer '(record {to = record {owner = principal "6tyot-2m6qr-z7xm7-gkmew-xmldo-wnmnt-7yry3-alxje-uxxc7-c3bhd-nqe" ; }; fee =  10_000_000 : nat;  amount =  100_000_000: nat ; })';
+//local 
+dfx canister call q4eej-kyaaa-aaaaa-aaaha-cai icrc1_transfer '(record {to = record {owner = principal "6tyot-2m6qr-z7xm7-gkmew-xmldo-wnmnt-7yry3-alxje-uxxc7-c3bhd-nqe" ; }; fee =  10_000_000 : nat;  amount =  100_000_000: nat ; })';
+
+
+if anyone wants 
+```
+dfx identity get-principal
+
+dfx canister --network=ic call db3eq-6iaaa-aaaah-abz6a-cai icrc1_transfer '(record {to = record {owner = principal "PUT WHERE YOU WANT TO SEND" ; }; fee =  10_000_000 : nat;  amount =  100_000_000: nat ; })';
+
+
+

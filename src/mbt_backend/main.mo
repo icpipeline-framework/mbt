@@ -75,11 +75,20 @@ actor {
     timeStamp: Int;
     responseStatus: Text;
   };
+  //BalanceOfResponse
+  public type TotalSupplyResponse = {
+    totalSupply: Nat ;
+    msg: Text;
+    timeStamp: Int;
+    responseStatus: Text;
+  };
 
   // //LOCAL
-  //var icrc1CanisterId : Text = "qoctq-giaaa-aaaaa-aaaea-cai";
+  //var icrc1CanisterId : Text = "qhbym-qaaaa-aaaaa-aaafq-cai";
+  //STAGE 
+  var icrc1CanisterId : Text = "7ldyp-fyaaa-aaaah-ab37a-cai";
   //PROD
-  var icrc1CanisterId : Text = "db3eq-6iaaa-aaaah-abz6a-cai";
+  //var icrc1CanisterId : Text = "db3eq-6iaaa-aaaah-abz6a-cai";
 
   // instantiate the actor for the icrc1 token
   let icrc1CanisterActor = actor(icrc1CanisterId): actor { 
@@ -140,6 +149,23 @@ actor {
     return tempBalanceOfResponse;
   }; // checkAccountBalance
 
+  public shared func getTotalSupply () : async TotalSupplyResponse {
+  
+    now := Time.now(); 
+    var tempMsg: Text = "";
+    var tempResponseStatus = "Green" ;      
+
+    var tempTotal : Nat = await icrc1CanisterActor.icrc1_total_supply() ;
+
+    var tempTotalSupplyResponse : TotalSupplyResponse = {
+      totalSupply = tempTotal ;
+      msg = tempMsg;
+      timeStamp = now;
+      responseStatus = tempResponseStatus;
+    };
+
+    return tempTotalSupplyResponse;
+  }; // getTotalSupply
 
   // public shared func greet(name : Text) : async Text {
     

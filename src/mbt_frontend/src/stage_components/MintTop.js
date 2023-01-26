@@ -40,6 +40,7 @@ const MintTop = (props) => {
   const [isMinting, setIsMinting] = useState(false);
   const [accountBalance, setAccountBalance] = useState(0);
   const [totalSupply, setTotalSupply] = useState(0);
+  const [checkedTotalSupply, setCheckedTotalSupply] = useState(false);
 
   const [isMinted, setIsMinted] = useState(false);
   const [textFieldValue, setTextFieldValue] = useState("");
@@ -101,7 +102,7 @@ const MintTop = (props) => {
     setWalletPrincipal(e.target.value);
   
   } // end onAccountNumberChange
-
+  
   const onMintNumberOfTokensChange = (e) => {
     const mintNumberAsNumber = Number (e.target.value.replace(/,/g,'')) ;
     var anyError = "";
@@ -237,6 +238,8 @@ const MintTop = (props) => {
       setIsMinting(false);
 
     } // end if there were any errors with the form
+    
+    checkTotalSupply ();
 
     console.log ("clickMintMBs END") ;
 
@@ -328,6 +331,63 @@ const MintTop = (props) => {
 
   } // end checkAccountBalance
 
+  const checkTotalSupply = async ()  =>  {
+
+      if (errorMsg != "")
+        setErrorMsg (""); 
+
+
+      
+
+      
+
+  
+        console.log ("1- checkTotalSupply - BEGIN ");
+
+      // const fetchData = await mbtDapp.greet("what up").catch(e => { return "ICPM Error: " + e });
+      var tempError = "";
+      const fetchData = await mbtDapp.getTotalSupply().catch(e => { tempError = "Check getTotalSupply Error: " + e });
+      
+      console.log ("2- checkTotalSupply - after await");
+  
+      console.log ("checkTotalSupply Response: ", fetchData);
+  
+      
+      if ( tempError != "" ) {
+        setErrorMsg (tempError);
+
+      } else {
+      
+        if (  (fetchData.responseStatus != "Green" )) {
+
+              var fetchDataString = JSON.stringify (fetchData, (key, value) =>
+                      typeof value === 'bigint'
+                          ? Number(value)
+                          : value // return everything else unchanged
+                      , 2) ;
+
+              setErrorMsg (fetchDataString);
+
+        } else {
+
+          setTotalSupply(fetchData.totalSupply);
+
+        }
+        
+    
+      } // end if error from IC call
+  
+
+    console.log ("checkTotalSupply END") ;
+
+  } // end checkTotalSupply
+
+if (!checkedTotalSupply && mbtDapp) {
+  setCheckedTotalSupply (true) ;
+  checkTotalSupply ();
+
+
+}
 
   var displayForm = [
 
@@ -339,7 +399,7 @@ const MintTop = (props) => {
               value={walletPrincipal}
               label={"Wallet Principal"} //optional
               type="text"
-              helperText=""
+              helperText="Enter your wallet principal or connect your wallet above"
               />  
         </Grid>
           <Grid item xs={12} md={3} sx={{display:"flex", pl:1, pr:1}} >
@@ -393,7 +453,7 @@ const MintTop = (props) => {
         </Grid>
         <Grid item xs={12} md={6} sx={{display:"flex", justifyContent: {xs:"center",md:"left"}}}>
               
-              <Typography variant="h4" color="#673e05" component="p" sx={{p:1,fontStyle:"", borderBottom:"1px solid #f7b354", width:"200px",textAlign:{xs:"center",md:"left"}}}>
+              <Typography variant="h4" color="#673e05" component="p" sx={{p:1,fontStyle:"", borderBottom:"1px solid #f7b354", textAlign:{xs:"center",md:"left"}}}>
                 {((Number(accountBalance)/100000000).toLocaleString("en-US"))} MBs
               </Typography> 
           
@@ -575,6 +635,8 @@ const MintTop = (props) => {
 
     ] ;
 } // end if is minting
+
+
   return (
     <Paper elevation={0} sx={{border:"0px solid #f9c57d", pb:4, backgroundColor: "#f3920c",border:"1px solid #f9c57d", borderRadius:2, justifyContent:"right",
           backgroundImage: {
@@ -655,7 +717,7 @@ const MintTop = (props) => {
                   , p:2, pb:0
                   }}
                   >
-                  {/* {(isChecking ? "..." : Math.round((Number(totalSupply)/100000000)).toLocaleString("en-US") + " MBs minted ")}  */}
+                  {(totalSupply == 0 ? "..." : Math.round((Number(totalSupply)/100000000)).toLocaleString("en-US") + " MBs minted ")} 
                   </Typography>
 
               </Grid>
